@@ -28,7 +28,7 @@ ELK/
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/ELK.git
+git clone https://github.com/iabd2425/ELK.git
 cd ELK
 ```
 
