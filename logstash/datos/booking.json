@@ -1,12 +1,16 @@
 [
     {
-      "nombre": "Hotel Centro Granada",
-      "ciudad": "Granada",
-      "precio": 85,
-      "puntuacion": 8.7,
-      "tipo": "Hotel",
-      "reseñas": 1240
-    },
+        "nombre": "Hotel Centro Granada",
+        "ciudad": "Granada",
+        "precio": 85,
+        "puntuacion": 8.7,
+        "tipo": "Hotel",
+        "reseñas": 1240,
+        "location": {
+          "lat": 37.1773,
+          "lon": -3.5986
+        }
+      },
     {
       "nombre": "Apartamento Alhambra Vista",
       "ciudad": "Granada",
