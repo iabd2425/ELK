@@ -1,6 +1,6 @@
 # Proyecto ELK - Chatbot Inteligente
 
-Este repositorio contiene la configuración y recursos necesarios para desplegar un stack **ELK (Elasticsearch, Logstash, Kibana)** complementado con **Metricbeat** para monitorización, como parte del desarrollo de un chatbot que consulta datos indexados en tiempo real.
+Este repositorio contiene la configuración y recursos necesarios para desplegar un stack **ELK (Elasticsearch, Logstash, Kibana)** complementado con **Metricbeat** para monitorización, como parte del desarrollo de un chatbot que consulta datos indexados en tiempo real. Incluye también un ejemplo visual con datos tipo Booking.com y un mapa de alojamientos.
 
 ---
 
@@ -12,11 +12,11 @@ ELK/
 ├── README.md                 # Documentación del proyecto
 ├── captures/                 # Capturas de pantallas de dashboards y alertas
 ├── kibana/
-│   ├── dashboards/           # Dashboards en formato NDJSON
+│   ├── dashboards/           # Dashboards en formato NDJSON (incluye uno tipo Booking)
 │   └── alertas/              # Alertas exportadas de Kibana
 ├── logstash/
 │   ├── pipelines.yml         # Definición de múltiples pipelines
-│   └── <nombre_modulo>/      # Configuración individual de Logstash
+│   └── datos/                # JSON de ejemplo y configuración Logstash
 └── metricbeat/
     ├── metricbeat.yml        # Configuración general de Metricbeat
     └── modules.d/            # Módulos activados (ES, Kibana)
@@ -65,12 +65,48 @@ Agente que monitoriza el estado de los servicios ELK y envía métricas sobre su
 
 ---
 
+## 🌍 Dashboard de Booking con mapa interactivo
+
+Este proyecto incluye un ejemplo de dashboard de alojamientos con:
+- Precio medio por ciudad
+- Puntuación media por tipo
+- Conteo por tipo de alojamiento
+- **Mapa interactivo** con coordenadas de ubicación
+
+Para ello, se utiliza un campo `location` con latitud y longitud y un índice preconfigurado con tipo `geo_point`.
+
+---
+
 ## 📋 Importación de dashboards y alertas
 
 1. Accede a Kibana: http://localhost:5601
 2. Ve a *Stack Management > Saved Objects*
-3. Pulsa "Import" y selecciona los archivos `.ndjson` dentro de `kibana/dashboards/` o `kibana/alertas/`
+3. Pulsa "Import" y selecciona el archivo `.ndjson` de `kibana/dashboards/booking_dashboard.ndjson`
+4. Asegúrate de que el índice `booking` ya existe con mapeo correcto (`location` como `geo_point`)
 
+---
+
+## 🧪 Datos de ejemplo
+
+Puedes cargar el archivo `logstash/datos/booking.json` con datos simulados extraídos de Booking.com. Incluye nombre, ciudad, puntuación, precio, tipo y coordenadas.
+
+Ejemplo de documento:
+```json
+{
+  "nombre": "Hotel Centro Granada",
+  "ciudad": "Granada",
+  "precio": 85,
+  "puntuacion": 8.7,
+  "tipo": "Hotel",
+  "reseñas": 1240,
+  "location": {
+    "lat": 37.1773,
+    "lon": -3.5986
+  }
+}
+```
+
+---
 
 ## 🧠 Recursos útiles
 
@@ -83,7 +119,8 @@ Agente que monitoriza el estado de los servicios ELK y envía métricas sobre su
 
 ## 🤝 Autores
 
-**Equipo de especialización en Big Data e IA**
+**Equipo de especialización en Big Data e IA**    
+
 IES Al-Ándalus · Curso 2024-2025
 
 ---

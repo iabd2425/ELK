@@ -1,0 +1,2 @@
+- pipeline.id: booking
+  path.config: "/usr/share/logstash/pipeline/booking.conf"

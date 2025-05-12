@@ -1,0 +1,27 @@
+[
+    {
+      "nombre": "Hotel Centro Granada",
+      "ciudad": "Granada",
+      "precio": 85,
+      "puntuacion": 8.7,
+      "tipo": "Hotel",
+      "reseñas": 1240
+    },
+    {
+      "nombre": "Apartamento Alhambra Vista",
+      "ciudad": "Granada",
+      "precio": 65,
+      "puntuacion": 9.1,
+      "tipo": "Apartamento",
+      "reseñas": 320
+    },
+    {
+      "nombre": "Hostal El Pilar",
+      "ciudad": "Madrid",
+      "precio": 45,
+      "puntuacion": 7.8,
+      "tipo": "Hostal",
+      "reseñas": 210
+    }
+  ]
+  
