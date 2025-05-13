@@ -27,20 +27,25 @@ ELK/
 ## 🚀 Puesta en marcha
 
 ### 1. Clonar el repositorio
+
 ```bash
 git clone https://github.com/iabd2425/ELK.git
 cd ELK
 ```
 
 ### 2. Arrancar los servicios (Docker)
+
 ```bash
 docker-compose up -d
 ```
+
 Esto iniciará los servicios:
-- Elasticsearch: http://localhost:9200
-- Kibana: http://localhost:5601
+
+* Elasticsearch: [http://localhost:9200](http://localhost:9200)
+* Kibana: [http://localhost:5601](http://localhost:5601)
 
 ### 3. Parar los servicios
+
 ```bash
 docker-compose down
 ```
@@ -52,15 +57,19 @@ docker-compose down
 ## 🔧 Servicios desplegados
 
 ### 🔍 Elasticsearch
+
 Motor de búsqueda distribuido que almacena y gestiona los datos estructurados del scraper para que el chatbot pueda consultarlos.
 
 ### 📊 Kibana
+
 Interfaz gráfica para crear dashboards interactivos, visualizar logs, métricas del sistema y configurar alertas.
 
 ### ⚙️ Logstash
+
 Procesador de datos que recibe la información desde el scraper o ficheros y la transforma antes de enviarla a Elasticsearch.
 
 ### 📈 Metricbeat
+
 Agente que monitoriza el estado de los servicios ELK y envía métricas sobre su rendimiento y uso de recursos.
 
 ---
@@ -68,10 +77,11 @@ Agente que monitoriza el estado de los servicios ELK y envía métricas sobre su
 ## 🌍 Dashboard de Booking con mapa interactivo
 
 Este proyecto incluye un ejemplo de dashboard de alojamientos con:
-- Precio medio por ciudad
-- Puntuación media por tipo
-- Conteo por tipo de alojamiento
-- **Mapa interactivo** con coordenadas de ubicación
+
+* Precio medio por ciudad
+* Puntuación media por tipo
+* Conteo por tipo de alojamiento
+* **Mapa interactivo** con coordenadas de ubicación
 
 Para ello, se utiliza un campo `location` con latitud y longitud y un índice preconfigurado con tipo `geo_point`.
 
@@ -79,7 +89,7 @@ Para ello, se utiliza un campo `location` con latitud y longitud y un índice pr
 
 ## 📋 Importación de dashboards y alertas
 
-1. Accede a Kibana: http://localhost:5601
+1. Accede a Kibana: [http://localhost:5601](http://localhost:5601)
 2. Ve a *Stack Management > Saved Objects*
 3. Pulsa "Import" y selecciona el archivo `.ndjson` de `kibana/dashboards/booking_dashboard.ndjson`
 4. Asegúrate de que el índice `booking` ya existe con mapeo correcto (`location` como `geo_point`)
@@ -91,6 +101,7 @@ Para ello, se utiliza un campo `location` con latitud y longitud y un índice pr
 Puedes cargar el archivo `logstash/datos/booking.json` con datos simulados extraídos de Booking.com. Incluye nombre, ciudad, puntuación, precio, tipo y coordenadas.
 
 Ejemplo de documento:
+
 ```json
 {
   "nombre": "Hotel Centro Granada",
@@ -108,12 +119,54 @@ Ejemplo de documento:
 
 ---
 
+## 📡 Monitorización del stack con Metricbeat
+
+Se ha añadido el servicio **Metricbeat** al stack Docker para recoger métricas de:
+
+* Elasticsearch
+* Kibana
+* Docker
+* (Opcionalmente) Logstash
+
+### Dashboards por defecto
+
+Para cargarlos:
+
+1. Espera a que Kibana esté activo en [http://localhost:5601](http://localhost:5601)
+
+2. Ejecuta manualmente:
+
+   ```bash
+   docker-compose up metricbeat
+   ```
+
+   Esto ejecutará `metricbeat setup --dashboards` automáticamente
+
+3. Luego en Kibana, ve a **Dashboards** y busca:
+
+   * `[Metricbeat] Elasticsearch Overview`
+   * `[Metricbeat] Kibana Overview`
+   * `[Metricbeat] Docker Overview`
+
+### Recomendación para producción
+
+Para asegurar que Metricbeat no falle si Kibana aún no ha arrancado, puedes retrasar su arranque modificando el `docker-compose.yml` así:
+
+```yaml
+command: >
+  bash -c "sleep 20 && metricbeat setup --dashboards && metricbeat -e"
+```
+
+Esto garantiza que Metricbeat esperará unos segundos antes de conectarse a Kibana.
+
+---
+
 ## 🧠 Recursos útiles
 
-- [Documentación oficial de Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/index.html)
-- [Documentación de Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
-- [Documentación de Logstash](https://www.elastic.co/guide/en/logstash/current/index.html)
-- [Documentación de Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
+* [Documentación oficial de Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/index.html)
+* [Documentación de Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
+* [Documentación de Logstash](https://www.elastic.co/guide/en/logstash/current/index.html)
+* [Documentación de Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
 
 ---
 
@@ -126,4 +179,3 @@ IES Al-Ándalus · Curso 2024-2025
 ---
 
 ¡Gracias por visitar nuestro proyecto! ✨
-

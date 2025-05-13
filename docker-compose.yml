@@ -22,5 +22,22 @@ services:
       - elasticsearch
     platform: linux/arm64  # Necesario para chip M1
 
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.13.0
+    container_name: metricbeat
+    user: root
+    volumes:
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    command: >
+      bash -c "sleep 20 && metricbeat setup --dashboards && metricbeat -e"
+
 volumes:
   esdata:
