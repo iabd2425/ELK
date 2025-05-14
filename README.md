@@ -161,6 +161,19 @@ Esto garantiza que Metricbeat esperará unos segundos antes de conectarse a Kiba
 
 ---
 
+## 📊 Dashboard de Monitorización del stack ELK
+
+Se ha creado un dashboard personalizado llamado **Monitorización del stack ELK**, que incluye visualizaciones construidas con datos reales recogidos por Metricbeat. Las visualizaciones son:
+
+* **Uso de CPU por host**
+* **Uso de memoria por host**
+* **Tráfico de red (entrante/saliente)**
+* **Total de eventos recibidos por módulo** Este panel es útil para saber qué componentes están enviando datos y en qué volumen.
+
+Todas ellas se han implementado como gráficos de barras por claridad visual, aunque pueden adaptarse también a gráficos de líneas para ver evolución temporal.
+
+---
+
 ## 🧠 Recursos útiles
 
 * [Documentación oficial de Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/index.html)
