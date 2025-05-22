@@ -38,6 +38,18 @@ services:
       - elasticsearch
     command: >
       bash -c "sleep 20 && metricbeat setup --dashboards && metricbeat -e"
+  
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.0
+    container_name: logstash
+    ports:
+      - 5044:5044
+    volumes:
+      - ./logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./logstash:/usr/share/logstash/pipeline/
+    depends_on:
+      - elasticsearch
+    platform: linux/arm64
 
 volumes:
   esdata:
