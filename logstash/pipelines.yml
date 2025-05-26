@@ -1,4 +1,6 @@
-- pipeline.id: hoteles
-  path.config: "/usr/share/logstash/pipeline/hoteles.conf"
-#- pipeline.id: booking
-#  path.config: "/usr/share/logstash/pipeline/booking.conf"
+- pipeline.id: booking
+  path.config: "/usr/share/logstash/pipeline/booking.conf"
+- pipeline.id: scraper
+  path.config: "/usr/share/logstash/pipeline/logstash.conf"
+- pipeline.id: logs_scraper
+  path.config: "/usr/share/logstash/pipeline/logstash_scraper.conf"

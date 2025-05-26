@@ -51,5 +51,16 @@ services:
       - elasticsearch
     platform: linux/arm64
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.13.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs/:/usr/share/filebeat/logs/:ro
+    depends_on:
+      - logstash
+    platform: linux/arm64
+
 volumes:
   esdata:

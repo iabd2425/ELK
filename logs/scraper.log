@@ -1,0 +1,4 @@
+2025-05-22T18:42:00 | INFO | scraping.py | Inicio del scraping
+2025-05-22T18:42:01 | INFO | scraping.py | Extrayendo datos de Booking
+2025-05-22T18:42:10 | INFO | scraping.py | Proceso completado sin errores
+2025-05-22T18:42:10 | INFO | scraping.py | Guardando datos en la base de datos
