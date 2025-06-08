@@ -1,6 +1,6 @@
 # Proyecto ELK - Chatbot Inteligente
 
-Este repositorio contiene la configuración y recursos necesarios para desplegar un stack **ELK (Elasticsearch, Logstash, Kibana)** complementado con **Metricbeat** para monitorización, como parte del desarrollo de un chatbot que consulta datos indexados en tiempo real. Incluye también un ejemplo visual con datos tipo Booking.com y un mapa de alojamientos.
+Este repositorio contiene la configuración y recursos necesarios para desplegar un stack **ELK (Elasticsearch, Logstash, Kibana)** complementado con **Metricbeat** y **Filebeat**, como parte del desarrollo de un sistema de búsqueda inteligente con datos reales obtenidos mediante scraping. Incluye dashboards de monitorización y visualización de datos de hoteles y logs de interacción con un chatbot.
 
 ---
 
@@ -12,11 +12,16 @@ ELK/
 ├── README.md                 # Documentación del proyecto
 ├── captures/                 # Capturas de pantallas de dashboards y alertas
 ├── kibana/
-│   ├── dashboards/           # Dashboards en formato NDJSON (incluye uno tipo Booking)
+│   ├── dashboards/           # Dashboards en formato NDJSON (hoteles, chatbot, completos)
 │   └── alertas/              # Alertas exportadas de Kibana
 ├── logstash/
 │   ├── pipelines.yml         # Definición de múltiples pipelines
-│   └── datos/                # JSON de ejemplo y configuración Logstash
+│   ├── hoteles.conf          # Pipeline para cargar datos de hoteles desde JSON
+│   ├── scraper_logs.conf     # Pipeline para procesar logs del scraper con grok
+│   ├── chatbot_logs.conf     # Pipeline para procesar logs del chatbot
+│   └── datos/                # JSON de ejemplo y logs
+├── filebeat/
+│   └── filebeat.yml          # Configuración de Filebeat para recoger logs locales
 └── metricbeat/
     ├── metricbeat.yml        # Configuración general de Metricbeat
     └── modules.d/            # Módulos activados (ES, Kibana)
@@ -58,7 +63,7 @@ docker-compose down
 
 ### 🔍 Elasticsearch
 
-Motor de búsqueda distribuido que almacena y gestiona los datos estructurados del scraper para que el chatbot pueda consultarlos.
+Motor de búsqueda distribuido que almacena datos del scraper y logs del sistema.
 
 ### 📊 Kibana
 
@@ -66,120 +71,85 @@ Interfaz gráfica para crear dashboards interactivos, visualizar logs, métricas
 
 ### ⚙️ Logstash
 
-Procesador de datos que recibe la información desde el scraper o ficheros y la transforma antes de enviarla a Elasticsearch.
+Procesador de datos que transforma e indexa información en Elasticsearch desde archivos `.json` y `.log`.
 
 ### 📈 Metricbeat
 
-Agente que monitoriza el estado de los servicios ELK y envía métricas sobre su rendimiento y uso de recursos.
+Monitoriza recursos del sistema ELK como uso de CPU, memoria y tráfico de red.
+
+### 📑 Filebeat
+
+Recolector ligero que envía automáticamente archivos `.log` a Logstash (scraper, chatbot).
 
 ---
 
-## 🌍 Dashboard de Booking con mapa interactivo
+## 🗺️ Dashboard de Hoteles (Booking)
 
-Este proyecto incluye un ejemplo de dashboard de alojamientos con:
+Este dashboard presenta información agregada y geolocalizada sobre alojamientos de Andalucía:
 
 * Precio medio por ciudad
 * Puntuación media por tipo
-* Conteo por tipo de alojamiento
-* **Mapa interactivo** con coordenadas de ubicación
+* Conteo de alojamientos por tipo
+* Mapa interactivo (`geo_point` con `location`)
+* Total de alojamientos
+* Panel de filtro por ciudad o provincia
 
-Para ello, se utiliza un campo `location` con latitud y longitud y un índice preconfigurado con tipo `geo_point`.
-
----
-
-## 📋 Importación de dashboards y alertas
-
-1. Accede a Kibana: [http://localhost:5601](http://localhost:5601)
-2. Ve a *Stack Management > Saved Objects*
-3. Pulsa "Import" y selecciona el archivo `.ndjson` de `kibana/dashboards/booking_dashboard.ndjson`
-4. Asegúrate de que el índice `booking` ya existe con mapeo correcto (`location` como `geo_point`)
-
----
-
-## 🧪 Datos de ejemplo
-
-Puedes cargar el archivo `logstash/datos/booking.json` con datos simulados extraídos de Booking.com. Incluye nombre, ciudad, puntuación, precio, tipo y coordenadas.
-
-Ejemplo de documento:
-
-```json
-{
-  "nombre": "Hotel Centro Granada",
-  "ciudad": "Granada",
-  "precio": 85,
-  "puntuacion": 8.7,
-  "tipo": "Hotel",
-  "reseñas": 1240,
-  "location": {
-    "lat": 37.1773,
-    "lon": -3.5986
-  }
-}
-```
-
----
-
-## 📡 Monitorización del stack con Metricbeat
-
-Se ha añadido el servicio **Metricbeat** al stack Docker para recoger métricas de:
-
-* Elasticsearch
-* Kibana
-* Docker
-* (Opcionalmente) Logstash
-
-### Dashboards por defecto
-
-Para cargarlos:
-
-1. Espera a que Kibana esté activo en [http://localhost:5601](http://localhost:5601)
-
-2. Ejecuta manualmente:
-
-   ```bash
-   docker-compose up metricbeat
-   ```
-
-   Esto ejecutará `metricbeat setup --dashboards` automáticamente
-
-3. Luego en Kibana, ve a **Dashboards** y busca:
-
-   * `[Metricbeat] Elasticsearch Overview`
-   * `[Metricbeat] Kibana Overview`
-   * `[Metricbeat] Docker Overview`
-
-### Recomendación para producción
-
-Para asegurar que Metricbeat no falle si Kibana aún no ha arrancado, puedes retrasar su arranque modificando el `docker-compose.yml` así:
-
-```yaml
-command: >
-  bash -c "sleep 20 && metricbeat setup --dashboards && metricbeat -e"
-```
-
-Esto garantiza que Metricbeat esperará unos segundos antes de conectarse a Kibana.
+📂 Archivo: `dashboards_hoteles_chatbot_clean.ndjson`
 
 ---
 
 ## 📊 Dashboard de Monitorización del stack ELK
 
-Se ha creado un dashboard personalizado llamado **Monitorización del stack ELK**, que incluye visualizaciones construidas con datos reales recogidos por Metricbeat. Las visualizaciones son:
+Incluye visualizaciones clave generadas por **Metricbeat**:
 
-* **Uso de CPU por host**
-* **Uso de memoria por host**
-* **Tráfico de red (entrante/saliente)**
-* **Total de eventos recibidos por módulo** Este panel es útil para saber qué componentes están enviando datos y en qué volumen.
-
-Todas ellas se han implementado como gráficos de barras por claridad visual, aunque pueden adaptarse también a gráficos de líneas para ver evolución temporal.
+* Uso de CPU por host
+* Uso de memoria por host
+* Tráfico de red (entrante/saliente)
+* Eventos recibidos por módulo (`event.dataset`)
 
 ---
 
-## 🧠 Recursos útiles
+## 💬 Dashboard de Logs del Chatbot
+
+Este dashboard representa información de los archivos `.log` generados por el chatbot:
+
+* Tiempo medio de respuesta (`elapsed_ms`)
+* Total de consultas realizadas
+* Porcentaje de errores vs éxitos
+* Preguntas más frecuentes
+* Tabla con interacción completa (pregunta, respuesta, timestamp)
+
+📂 Archivo: `visualizaciones_completas_elk.ndjson` + `dashboard_completo_elk.ndjson`
+
+> Requiere datos indexados en el índice `chatbot-2025.05.27`
+
+---
+
+## 📥 Importación de visualizaciones y dashboards
+
+1. Accede a Kibana: [http://localhost:5601](http://localhost:5601)
+2. Ve a *Stack Management > Saved Objects*
+3. Pulsa **Import** y selecciona los archivos `.ndjson` desde `kibana/dashboards/`
+4. Entra a *Dashboard* y selecciona uno de los disponibles
+5. Puedes añadir visualizaciones desde la librería visual o crear nuevas
+
+---
+
+## 🔐 Seguridad y buenas prácticas
+
+* No se activa autenticación en desarrollo (`xpack.security.enabled=false`)
+* Filebeat y Logstash usan rutas relativas para facilitar despliegue
+* Se recomienda usar `sleep` en Metricbeat para que Kibana esté disponible al iniciar
+
+---
+
+## 📘 Recursos útiles
 
 * [Documentación oficial de Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/index.html)
 * [Documentación de Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
 * [Documentación de Logstash](https://www.elastic.co/guide/en/logstash/current/index.html)
 * [Documentación de Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
+* [Documentación de Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
 
 ---
 
